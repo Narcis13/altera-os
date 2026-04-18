@@ -1,0 +1,16 @@
+{
+  "name": "altera-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "altera": "./src/bin.ts"
+  },
+  "scripts": {
+    "start": "bun run src/bin.ts",
+    "build": "bun build ./src/bin.ts --compile --outfile=../../altera"
+  },
+  "dependencies": {
+    "@altera/core": "workspace:*"
+  }
+}

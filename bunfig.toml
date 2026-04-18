@@ -1,0 +1,15 @@
+# Bun runtime config — Altera OS
+
+[install]
+# Hoist workspaces, cache deps
+registry = "https://registry.npmjs.org/"
+
+[install.scopes]
+
+[test]
+# Test runner config
+coverage = false
+
+[run]
+# Default to bun for scripts in package.json
+bun = true

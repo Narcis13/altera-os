@@ -1,0 +1,17 @@
+import { randomUUID } from 'node:crypto';
+
+const PREFIXES = {
+  tenant: 'tnt',
+  user: 'usr',
+  session: 'ses',
+  audit: 'adt',
+  file: 'fil',
+  entity: 'ent',
+  attribute: 'atr',
+} as const;
+
+export type IdPrefix = keyof typeof PREFIXES;
+
+export function newId(kind: IdPrefix): string {
+  return `${PREFIXES[kind]}_${randomUUID().replace(/-/g, '')}`;
+}

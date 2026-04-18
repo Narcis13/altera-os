@@ -1,0 +1,27 @@
+{
+  "name": "@altera/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./migrate": "./src/migrate.ts",
+    "./seed": "./src/seed.ts"
+  },
+  "scripts": {
+    "migrate": "bun run src/migrate.ts",
+    "seed": "bun run src/seed.ts",
+    "drizzle:generate": "bunx drizzle-kit generate",
+    "drizzle:push": "bunx drizzle-kit push"
+  },
+  "dependencies": {
+    "@altera/core": "workspace:*",
+    "drizzle-orm": "^0.38.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.1"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "altera-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Altera OS — Bun monorepo for document ingest, EAV, agent runtime, and admin UI.",
+  "type": "module",
+  "workspaces": ["apps/*", "packages/@altera/*"],
+  "scripts": {
+    "dev": "bun run --filter 'altera-server' dev",
+    "dev:server": "bun run --filter 'altera-server' dev",
+    "dev:admin": "bun run --filter 'altera-admin' dev",
+    "admin:dev": "bun run --filter 'altera-admin' dev",
+    "cli": "bun run --filter 'altera-cli' start",
+    "build": "bun run --filter '*' build",
+    "test": "bun test",
+    "typecheck": "bunx tsc --noEmit",
+    "lint": "bunx biome check .",
+    "lint:fix": "bunx biome check --write .",
+    "format": "bunx biome format --write .",
+    "migrate": "bun run packages/@altera/db/src/migrate.ts",
+    "seed:dev": "bun run packages/@altera/db/src/seed.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "^1.3.0",
+    "bun-types": "^1.3.8",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  }
+}

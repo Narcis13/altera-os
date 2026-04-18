@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "apps/altera-server/**/*.ts",
+    "apps/altera-cli/**/*.ts",
+    "packages/@altera/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/dist",
+    "**/build",
+    "**/.vite",
+    "**/*.d.ts",
+    "apps/altera-admin/**"
+  ]
+}
