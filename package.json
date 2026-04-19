@@ -7,6 +7,7 @@
   "workspaces": ["apps/*", "packages/@altera/*"],
   "scripts": {
     "dev": "bun run --filter 'altera-server' dev",
+    "dev:all": "bash scripts/dev.sh",
     "dev:server": "bun run --filter 'altera-server' dev",
     "dev:admin": "bun run --filter 'altera-admin' dev",
     "admin:dev": "bun run --filter 'altera-admin' dev",
