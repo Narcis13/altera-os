@@ -1,3 +1,4 @@
+import { AnthropicProvider, ClassifySubscriber } from '@altera/agent';
 import type { JwtConfig } from '@altera/auth';
 import type { AlteraDb } from '@altera/db';
 import {
@@ -13,6 +14,7 @@ import { errorHandler } from './middleware/error.ts';
 import { corsMiddleware, requestLogger } from './middleware/logging.ts';
 import { authRoutes } from './routes/auth.ts';
 import { entitiesRoutes } from './routes/entities.ts';
+import { taxonomyRoutes } from './routes/taxonomy.ts';
 import { eventsRoutes } from './routes/events.ts';
 import { filesRoutes } from './routes/files.ts';
 import { healthRoutes } from './routes/health.ts';
@@ -30,6 +32,7 @@ export interface BuiltApp {
   sse: SseManager;
   ws: WsManager;
   ingest: IngestWorker;
+  classify: ClassifySubscriber | null;
 }
 
 export function buildApp(deps: BuildAppDeps): Hono {
@@ -59,6 +62,22 @@ export function buildAppWithBus(deps: BuildAppDeps): BuiltApp {
   });
   ingest.start();
 
+  let classify: ClassifySubscriber | null = null;
+  const anthropic = deps.config.anthropic;
+  if (anthropic?.enabled && anthropic.apiKey) {
+    const provider = new AnthropicProvider({
+      apiKey: anthropic.apiKey,
+      defaultModel: anthropic.model,
+    });
+    classify = new ClassifySubscriber({
+      db: deps.db,
+      bus,
+      provider,
+      model: anthropic.model,
+    });
+    classify.start();
+  }
+
   app.use('*', requestLogger());
   app.use('*', corsMiddleware(deps.config.corsOrigins));
 
@@ -77,6 +96,7 @@ export function buildAppWithBus(deps: BuildAppDeps): BuiltApp {
     }),
   );
   app.route('/api/entities', entitiesRoutes({ db: deps.db, jwt }));
+  app.route('/api/taxonomy', taxonomyRoutes({ db: deps.db, jwt }));
 
   app.notFound((c) =>
     c.json(
@@ -86,5 +106,5 @@ export function buildAppWithBus(deps: BuildAppDeps): BuiltApp {
   );
   app.onError(errorHandler);
 
-  return { app, bus, activity, sse, ws, ingest };
+  return { app, bus, activity, sse, ws, ingest, classify };
 }

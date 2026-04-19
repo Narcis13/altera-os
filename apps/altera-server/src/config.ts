@@ -17,6 +17,11 @@ export interface ServerConfig {
   jwtRefreshTtlSec: number;
   corsOrigins: string[];
   logLevel: 'debug' | 'info' | 'warn' | 'error';
+  anthropic?: {
+    apiKey: string | null;
+    model: string;
+    enabled: boolean;
+  };
 }
 
 function envStr(key: string, fallback: string): string {
@@ -39,6 +44,9 @@ export function loadConfig(): ServerConfig {
     throw new Error('JWT_SECRET is required in production');
   }
 
+  const anthropicKey = envStr('ANTHROPIC_API_KEY', '');
+  const anthropicEnabled = envStr('ALTERA_AGENT_ENABLED', anthropicKey ? 'true' : 'false') === 'true';
+
   return {
     env,
     host: envStr('HOST', DEFAULT_HOST),
@@ -54,5 +62,10 @@ export function loadConfig(): ServerConfig {
       .map((s) => s.trim())
       .filter(Boolean),
     logLevel: envStr('LOG_LEVEL', 'info') as ServerConfig['logLevel'],
+    anthropic: {
+      apiKey: anthropicKey || null,
+      model: envStr('ALTERA_AGENT_MODEL', 'claude-sonnet-4-5'),
+      enabled: anthropicEnabled && anthropicKey.length > 0,
+    },
   };
 }

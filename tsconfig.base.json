@@ -35,7 +35,11 @@
       "@altera/events": ["packages/@altera/events/src/index.ts"],
       "@altera/events/*": ["packages/@altera/events/src/*"],
       "@altera/ingest": ["packages/@altera/ingest/src/index.ts"],
-      "@altera/ingest/*": ["packages/@altera/ingest/src/*"]
+      "@altera/ingest/*": ["packages/@altera/ingest/src/*"],
+      "@altera/eav": ["packages/@altera/eav/src/index.ts"],
+      "@altera/eav/*": ["packages/@altera/eav/src/*"],
+      "@altera/agent": ["packages/@altera/agent/src/index.ts"],
+      "@altera/agent/*": ["packages/@altera/agent/src/*"]
     }
   }
 }

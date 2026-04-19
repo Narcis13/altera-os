@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { sessionStore } from './api';
 import { DashboardPage } from './pages/DashboardPage';
+import { EntitiesPage } from './pages/EntitiesPage';
 import { EventsPage } from './pages/EventsPage';
 import { IngestPage } from './pages/IngestPage';
 import { LoginPage } from './pages/LoginPage';
@@ -36,6 +37,14 @@ export default function App() {
         element={
           <RequireAuth>
             <IngestPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/entities"
+        element={
+          <RequireAuth>
+            <EntitiesPage />
           </RequireAuth>
         }
       />

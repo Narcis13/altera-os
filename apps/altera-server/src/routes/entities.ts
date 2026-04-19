@@ -1,13 +1,37 @@
 import { type JwtConfig, requireAuth, withTenant } from '@altera/auth';
-import { notFound } from '@altera/core';
+import { notFound, validationError } from '@altera/core';
 import type { AlteraDb } from '@altera/db';
-import { schema } from '@altera/db';
-import { and, desc, eq } from 'drizzle-orm';
+import { getAttributes, getEntity, queryEntities, searchFts } from '@altera/eav';
+import type { EntityQuery } from '@altera/eav';
 import { Hono } from 'hono';
 
 export interface EntitiesRoutesDeps {
   db: AlteraDb;
   jwt: JwtConfig;
+}
+
+function parseQuery(url: URL): EntityQuery {
+  const q: EntityQuery = {};
+  const entityType = url.searchParams.get('entityType');
+  if (entityType) q.entityType = entityType;
+  const sourceFileId = url.searchParams.get('sourceFileId');
+  if (sourceFileId) q.sourceFileId = sourceFileId;
+  const status = url.searchParams.getAll('status');
+  if (status.length === 1) q.status = status[0] as EntityQuery['status'];
+  else if (status.length > 1) q.status = status as never;
+  const search = url.searchParams.get('search');
+  if (search) q.search = search;
+  const ingestedAfter = url.searchParams.get('ingestedAfter');
+  if (ingestedAfter) q.ingestedAfter = new Date(ingestedAfter);
+  const ingestedBefore = url.searchParams.get('ingestedBefore');
+  if (ingestedBefore) q.ingestedBefore = new Date(ingestedBefore);
+  const orderBy = url.searchParams.get('orderBy');
+  if (orderBy === 'ingestedAt:asc' || orderBy === 'ingestedAt:desc') q.orderBy = orderBy;
+  const limit = Number.parseInt(url.searchParams.get('limit') ?? '', 10);
+  if (Number.isFinite(limit)) q.limit = limit;
+  const offset = Number.parseInt(url.searchParams.get('offset') ?? '', 10);
+  if (Number.isFinite(offset)) q.offset = offset;
+  return q;
 }
 
 export function entitiesRoutes(deps: EntitiesRoutesDeps): Hono {
@@ -18,65 +42,61 @@ export function entitiesRoutes(deps: EntitiesRoutesDeps): Hono {
   app.get('/', (c) => {
     const principal = c.get('principal');
     const url = new URL(c.req.url);
-    const limit = Math.min(
-      Math.max(Number.parseInt(url.searchParams.get('limit') ?? '50', 10) || 50, 1),
-      200,
+    const result = queryEntities(
+      { db: deps.db, tenantId: principal.tenantId },
+      parseQuery(url),
     );
-    const offset = Math.max(
-      Number.parseInt(url.searchParams.get('offset') ?? '0', 10) || 0,
-      0,
-    );
-
-    const rows = deps.db
-      .select()
-      .from(schema.entities)
-      .where(eq(schema.entities.tenantId, principal.tenantId))
-      .orderBy(desc(schema.entities.ingestedAt))
-      .limit(limit)
-      .offset(offset)
-      .all();
-
     return c.json({
-      entities: rows.map((r) => ({
+      entities: result.entities.map((r) => ({
         id: r.id,
         entityType: r.entityType,
         name: r.name,
         status: r.status,
+        classificationConfidence: r.classificationConfidence,
         sourceFileId: r.sourceFileId,
         ingestedAt: r.ingestedAt.toISOString(),
       })),
-      limit,
-      offset,
+      total: result.total,
+      limit: result.limit,
+      offset: result.offset,
+    });
+  });
+
+  app.get('/search', (c) => {
+    const principal = c.get('principal');
+    const url = new URL(c.req.url);
+    const text = url.searchParams.get('q') ?? '';
+    if (text.trim().length === 0) throw validationError('Missing "q" query param');
+    const limit = Number.parseInt(url.searchParams.get('limit') ?? '50', 10) || 50;
+    const ctx = { db: deps.db, tenantId: principal.tenantId };
+    const hits = searchFts(ctx, text, { limit });
+    return c.json({
+      query: text,
+      hits: hits.map((h) => ({
+        entityId: h.entityId,
+        attributeId: h.attributeId,
+        key: h.key,
+        snippet: h.snippet,
+        rank: h.rank,
+      })),
     });
   });
 
   app.get('/:id', (c) => {
     const principal = c.get('principal');
     const id = c.req.param('id');
-
-    const entity = deps.db
-      .select()
-      .from(schema.entities)
-      .where(
-        and(eq(schema.entities.id, id), eq(schema.entities.tenantId, principal.tenantId)),
-      )
-      .get();
+    const ctx = { db: deps.db, tenantId: principal.tenantId };
+    const entity = getEntity(ctx, id);
     if (!entity) throw notFound('Entity not found');
-
-    const attrs = deps.db
-      .select()
-      .from(schema.attributes)
-      .where(eq(schema.attributes.entityId, entity.id))
-      .all();
-
+    const attrs = getAttributes(ctx, entity.id);
     return c.json({
       entity: {
         id: entity.id,
         entityType: entity.entityType,
         name: entity.name,
         status: entity.status,
-        sourceFileId: entity.sourceFileId,
         classificationConfidence: entity.classificationConfidence,
+        sourceFileId: entity.sourceFileId,
         ingestedAt: entity.ingestedAt.toISOString(),
       },
       attributes: attrs.map((a) => ({
@@ -85,7 +105,7 @@ export function entitiesRoutes(deps: EntitiesRoutesDeps): Hono {
         valueText: a.valueText,
         valueNumber: a.valueNumber,
         valueDate: a.valueDate ? a.valueDate.toISOString() : null,
-        valueJson: a.valueJson ? (tryParseJson(a.valueJson) ?? a.valueJson) : null,
+        valueJson: a.valueJson,
         isSensitive: a.isSensitive,
         extractedBy: a.extractedBy,
         confidence: a.confidence,
@@ -95,12 +115,4 @@ export function entitiesRoutes(deps: EntitiesRoutesDeps): Hono {
   });
 
   return app;
-}
-
-function tryParseJson(raw: string): unknown {
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
 }

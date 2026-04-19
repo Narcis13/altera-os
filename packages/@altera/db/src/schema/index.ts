@@ -4,3 +4,4 @@ export * from './audit.ts';
 export * from './files.ts';
 export * from './events.ts';
 export * from './entities.ts';
+export * from './taxonomy.ts';

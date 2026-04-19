@@ -12,6 +12,8 @@
     "@altera/auth": "workspace:*",
     "@altera/core": "workspace:*",
     "@altera/db": "workspace:*",
+    "@altera/agent": "workspace:*",
+    "@altera/eav": "workspace:*",
     "@altera/events": "workspace:*",
     "@altera/ingest": "workspace:*",
     "drizzle-orm": "^0.38.2",

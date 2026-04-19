@@ -65,6 +65,12 @@ export function DashboardPage() {
             Ingest
           </Link>
           <Link
+            to="/entities"
+            className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
+          >
+            Entities
+          </Link>
+          <Link
             to="/events"
             className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
           >
