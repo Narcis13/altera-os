@@ -55,3 +55,80 @@ export function me(apiUrl: string, accessToken: string) {
     headers: { authorization: `Bearer ${accessToken}` },
   });
 }
+
+export interface UploadedFile {
+  id: string;
+  tenantId: string;
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  hashSha256: string;
+  storagePath: string;
+  uploadedAt: string;
+}
+
+export async function uploadFile(
+  apiUrl: string,
+  accessToken: string,
+  input: { filename: string; data: Uint8Array; mimeType: string },
+): Promise<UploadedFile> {
+  const blob = new Blob([new Uint8Array(input.data)], { type: input.mimeType });
+  const form = new FormData();
+  form.set('file', blob, input.filename);
+  return call<UploadedFile>(`${apiUrl}/api/files/upload`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${accessToken}` },
+    body: form,
+  });
+}
+
+export interface EntityListItem {
+  id: string;
+  entityType: string | null;
+  name: string | null;
+  status: string;
+  sourceFileId: string | null;
+  ingestedAt: string;
+}
+
+export function listEntities(
+  apiUrl: string,
+  accessToken: string,
+  opts: { limit?: number; offset?: number } = {},
+): Promise<{ entities: EntityListItem[]; limit: number; offset: number }> {
+  const qs = new URLSearchParams();
+  if (opts.limit !== undefined) qs.set('limit', String(opts.limit));
+  if (opts.offset !== undefined) qs.set('offset', String(opts.offset));
+  const tail = qs.toString() ? `?${qs.toString()}` : '';
+  return call(`${apiUrl}/api/entities${tail}`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export interface EntityDetail {
+  entity: EntityListItem & {
+    classificationConfidence: number | null;
+  };
+  attributes: Array<{
+    id: string;
+    key: string;
+    valueText: string | null;
+    valueNumber: number | null;
+    valueDate: string | null;
+    valueJson: unknown;
+    isSensitive: boolean;
+    extractedBy: string;
+    confidence: number | null;
+    createdAt: string;
+  }>;
+}
+
+export function getEntity(
+  apiUrl: string,
+  accessToken: string,
+  id: string,
+): Promise<EntityDetail> {
+  return call(`${apiUrl}/api/entities/${id}`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+}

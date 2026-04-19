@@ -8,6 +8,7 @@ const PREFIXES = {
   file: 'fil',
   entity: 'ent',
   attribute: 'atr',
+  event: 'evt',
 } as const;
 
 export type IdPrefix = keyof typeof PREFIXES;

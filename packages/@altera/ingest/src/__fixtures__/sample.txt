@@ -1,0 +1,3 @@
+Altera OS plaintext fixture.
+Line two.
+Line three has tabs	and	stuff.

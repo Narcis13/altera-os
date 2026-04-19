@@ -48,7 +48,7 @@ async function main() {
 
   if (admin.length === 0) {
     const userId = newId('user');
-    const passwordHash = await hasher('change-me-now-please');
+    const passwordHash = await hasher('admin1234admin');
     db.insert(users)
       .values({
         id: userId,
@@ -60,7 +60,7 @@ async function main() {
         createdAt: new Date(),
       })
       .run();
-    console.log(`[seed] Created admin user ${userId} (admin / change-me-now-please)`);
+    console.log(`[seed] Created admin user ${userId} (admin / admin1234admin)`);
   } else {
     console.log('[seed] Admin user exists.');
   }

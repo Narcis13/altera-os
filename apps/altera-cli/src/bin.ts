@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { authLogin, authLogout, authWhoAmI } from './commands/auth.ts';
 import { configSet, configShow } from './commands/config.ts';
+import { entityList, entityShow, ingestFile } from './commands/ingest.ts';
 
 const USAGE = `altera — Altera OS CLI
 
@@ -10,6 +11,9 @@ Usage:
   altera auth whoami
   altera config show
   altera config set <key> <value>
+  altera ingest <file>
+  altera entity list [--limit N] [--offset N]
+  altera entity show <entity-id>
   altera --help
   altera --version
 
@@ -52,6 +56,19 @@ async function main(argv: string[]): Promise<number> {
           return configSet(rest);
         default:
           console.error(`Unknown config subcommand: ${sub ?? '<none>'}`);
+          console.error(USAGE);
+          return 2;
+      }
+    case 'ingest':
+      return ingestFile(sub ? [sub, ...rest] : rest);
+    case 'entity':
+      switch (sub) {
+        case 'list':
+          return entityList(rest);
+        case 'show':
+          return entityShow(rest);
+        default:
+          console.error(`Unknown entity subcommand: ${sub ?? '<none>'}`);
           console.error(USAGE);
           return 2;
       }

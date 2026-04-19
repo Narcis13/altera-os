@@ -1,0 +1,21 @@
+{
+  "name": "@altera/ingest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@altera/core": "workspace:*",
+    "@altera/db": "workspace:*",
+    "@altera/events": "workspace:*",
+    "csv-parse": "^5.6.0",
+    "drizzle-orm": "^0.38.2",
+    "mammoth": "^1.8.0",
+    "pdf-parse": "^1.1.1",
+    "xlsx": "^0.18.5"
+  }
+}

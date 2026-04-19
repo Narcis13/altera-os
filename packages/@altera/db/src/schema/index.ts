@@ -2,3 +2,5 @@ export * from './tenants.ts';
 export * from './users.ts';
 export * from './audit.ts';
 export * from './files.ts';
+export * from './events.ts';
+export * from './entities.ts';

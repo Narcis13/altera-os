@@ -31,7 +31,11 @@
       "@altera/db": ["packages/@altera/db/src/index.ts"],
       "@altera/db/*": ["packages/@altera/db/src/*"],
       "@altera/auth": ["packages/@altera/auth/src/index.ts"],
-      "@altera/auth/*": ["packages/@altera/auth/src/*"]
+      "@altera/auth/*": ["packages/@altera/auth/src/*"],
+      "@altera/events": ["packages/@altera/events/src/index.ts"],
+      "@altera/events/*": ["packages/@altera/events/src/*"],
+      "@altera/ingest": ["packages/@altera/ingest/src/index.ts"],
+      "@altera/ingest/*": ["packages/@altera/ingest/src/*"]
     }
   }
 }

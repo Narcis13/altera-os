@@ -10,6 +10,8 @@ export interface ServerConfig {
   host: string;
   port: number;
   databaseUrl: string;
+  dataDir: string;
+  maxUploadBytes: number;
   jwtSecret: string;
   jwtAccessTtlSec: number;
   jwtRefreshTtlSec: number;
@@ -42,6 +44,8 @@ export function loadConfig(): ServerConfig {
     host: envStr('HOST', DEFAULT_HOST),
     port: envInt('PORT', DEFAULT_PORT),
     databaseUrl: envStr('DATABASE_URL', './data/altera.db'),
+    dataDir: envStr('ALTERA_DATA_DIR', './data'),
+    maxUploadBytes: envInt('ALTERA_MAX_UPLOAD_BYTES', 50 * 1024 * 1024),
     jwtSecret: jwtSecret || 'dev-only-secret-change-in-production-xxxxxxxxxxxxxxxxxxxxxxxx',
     jwtAccessTtlSec: envInt('JWT_ACCESS_TTL', DEFAULT_JWT_ACCESS_TTL_SEC),
     jwtRefreshTtlSec: envInt('JWT_REFRESH_TTL', DEFAULT_JWT_REFRESH_TTL_SEC),

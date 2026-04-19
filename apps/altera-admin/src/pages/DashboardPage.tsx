@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { type Session, api, sessionStore } from '../api';
 
 export function DashboardPage() {
@@ -58,6 +58,18 @@ export function DashboardPage() {
           <p className="text-xs text-slate-500">Sprint 1 skeleton</p>
         </div>
         <div className="flex items-center gap-3 text-sm">
+          <Link
+            to="/ingest"
+            className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
+          >
+            Ingest
+          </Link>
+          <Link
+            to="/events"
+            className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100"
+          >
+            Events
+          </Link>
           <span className="text-slate-600">
             {me?.user.username ?? '…'}{' '}
             <span className="text-slate-400">@ {me?.tenantSlug ?? ''}</span>

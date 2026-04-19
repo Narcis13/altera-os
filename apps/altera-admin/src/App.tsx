@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { sessionStore } from './api';
 import { DashboardPage } from './pages/DashboardPage';
+import { EventsPage } from './pages/EventsPage';
+import { IngestPage } from './pages/IngestPage';
 import { LoginPage } from './pages/LoginPage';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -18,6 +20,22 @@ export default function App() {
         element={
           <RequireAuth>
             <DashboardPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/events"
+        element={
+          <RequireAuth>
+            <EventsPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/ingest"
+        element={
+          <RequireAuth>
+            <IngestPage />
           </RequireAuth>
         }
       />

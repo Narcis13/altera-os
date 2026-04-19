@@ -56,6 +56,34 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 
+export interface FileListItem {
+  id: string;
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  hashSha256: string;
+  uploadedAt: string;
+}
+
+export interface FileListResponse {
+  files: FileListItem[];
+  limit: number;
+  offset: number;
+}
+
+export interface FileDetail {
+  file: FileListItem & { storagePath: string };
+  entity: {
+    id: string;
+    status: string;
+    entityType: string | null;
+    name: string | null;
+    ingestedAt: string;
+  } | null;
+  rawText: string | null;
+  parseMetadata: unknown;
+}
+
 export const api = {
   login(input: { tenantSlug: string; usernameOrEmail: string; password: string }) {
     return request<Session>('/api/auth/login', {
@@ -77,5 +105,42 @@ export const api = {
 
   health() {
     return request<{ ok: boolean; service: string }>('/api/health');
+  },
+
+  debugEmit(input: { type: string; payload?: unknown }) {
+    return request<{ id: string; type: string; createdAt: string }>('/api/events/debug-emit', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  listFiles(input: { limit?: number; offset?: number } = {}) {
+    const params = new URLSearchParams();
+    if (input.limit !== undefined) params.set('limit', String(input.limit));
+    if (input.offset !== undefined) params.set('offset', String(input.offset));
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return request<FileListResponse>(`/api/files${qs}`);
+  },
+
+  getFile(id: string) {
+    return request<FileDetail>(`/api/files/${id}`);
+  },
+
+  async uploadFile(file: File): Promise<FileListItem> {
+    const session = sessionStore.get();
+    const fd = new FormData();
+    fd.set('file', file);
+    const headers: HeadersInit = {};
+    if (session) headers.authorization = `Bearer ${session.accessToken}`;
+    const res = await fetch('/api/files/upload', { method: 'POST', headers, body: fd });
+    const body = await res.json();
+    if (!res.ok) {
+      const err = (body as ApiError).error ?? {
+        code: `HTTP_${res.status}`,
+        message: 'Upload failed',
+      };
+      throw Object.assign(new Error(err.message), err);
+    }
+    return body as FileListItem;
   },
 };

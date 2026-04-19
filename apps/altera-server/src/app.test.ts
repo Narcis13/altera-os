@@ -14,6 +14,8 @@ const baseConfig: ServerConfig = {
   host: '127.0.0.1',
   port: 0,
   databaseUrl: '',
+  dataDir: './data',
+  maxUploadBytes: 10 * 1024 * 1024,
   jwtSecret: 'test-secret-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
   jwtAccessTtlSec: 60,
   jwtRefreshTtlSec: 120,
