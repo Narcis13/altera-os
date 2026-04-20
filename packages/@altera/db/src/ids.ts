@@ -9,6 +9,12 @@ const PREFIXES = {
   entity: 'ent',
   attribute: 'atr',
   event: 'evt',
+  docTemplate: 'dtp',
+  docSubmission: 'dsb',
+  docRender: 'drn',
+  workflowDef: 'wfd',
+  workflowRun: 'run',
+  workflowEvent: 'wfe',
 } as const;
 
 export type IdPrefix = keyof typeof PREFIXES;

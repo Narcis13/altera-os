@@ -13,10 +13,12 @@ import type { ServerConfig } from './config.ts';
 import { errorHandler } from './middleware/error.ts';
 import { corsMiddleware, requestLogger } from './middleware/logging.ts';
 import { authRoutes } from './routes/auth.ts';
+import { docsRoutes } from './routes/docs.ts';
 import { entitiesRoutes } from './routes/entities.ts';
 import { taxonomyRoutes } from './routes/taxonomy.ts';
 import { eventsRoutes } from './routes/events.ts';
 import { filesRoutes } from './routes/files.ts';
+import { flowsRoutes } from './routes/flows.ts';
 import { healthRoutes } from './routes/health.ts';
 import { meRoutes } from './routes/me.ts';
 
@@ -97,6 +99,8 @@ export function buildAppWithBus(deps: BuildAppDeps): BuiltApp {
   );
   app.route('/api/entities', entitiesRoutes({ db: deps.db, jwt }));
   app.route('/api/taxonomy', taxonomyRoutes({ db: deps.db, jwt }));
+  app.route('/api/docs', docsRoutes({ db: deps.db, jwt }));
+  app.route('/api/flows', flowsRoutes({ db: deps.db, jwt, anthropic }));
 
   app.notFound((c) =>
     c.json(

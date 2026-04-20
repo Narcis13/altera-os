@@ -39,7 +39,13 @@
       "@altera/eav": ["packages/@altera/eav/src/index.ts"],
       "@altera/eav/*": ["packages/@altera/eav/src/*"],
       "@altera/agent": ["packages/@altera/agent/src/index.ts"],
-      "@altera/agent/*": ["packages/@altera/agent/src/*"]
+      "@altera/agent/*": ["packages/@altera/agent/src/*"],
+      "@altera/loom": ["packages/@altera/loom/src/index.ts"],
+      "@altera/loom/*": ["packages/@altera/loom/src/*"],
+      "@altera/docs": ["packages/@altera/docs/src/index.ts"],
+      "@altera/docs/*": ["packages/@altera/docs/src/*"],
+      "@altera/flows": ["packages/@altera/flows/src/index.ts"],
+      "@altera/flows/*": ["packages/@altera/flows/src/*"]
     }
   }
 }

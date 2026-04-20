@@ -48,9 +48,12 @@
         "@altera/auth": "workspace:*",
         "@altera/core": "workspace:*",
         "@altera/db": "workspace:*",
+        "@altera/docs": "workspace:*",
         "@altera/eav": "workspace:*",
         "@altera/events": "workspace:*",
+        "@altera/flows": "workspace:*",
         "@altera/ingest": "workspace:*",
+        "@altera/loom": "workspace:*",
         "drizzle-orm": "^0.38.2",
         "hono": "^4.6.14",
         "zod": "^3.24.1",
@@ -98,6 +101,17 @@
         "drizzle-kit": "^0.30.1",
       },
     },
+    "packages/@altera/docs": {
+      "name": "@altera/docs",
+      "version": "0.1.0",
+      "dependencies": {
+        "@altera/core": "workspace:*",
+        "@altera/db": "workspace:*",
+        "@altera/loom": "workspace:*",
+        "drizzle-orm": "^0.38.2",
+        "zod": "^3.24.1",
+      },
+    },
     "packages/@altera/eav": {
       "name": "@altera/eav",
       "version": "0.1.0",
@@ -118,6 +132,18 @@
         "zod": "^3.24.1",
       },
     },
+    "packages/@altera/flows": {
+      "name": "@altera/flows",
+      "version": "0.1.0",
+      "dependencies": {
+        "@altera/agent": "workspace:*",
+        "@altera/core": "workspace:*",
+        "@altera/db": "workspace:*",
+        "@altera/docs": "workspace:*",
+        "drizzle-orm": "^0.38.2",
+        "zod": "^3.24.1",
+      },
+    },
     "packages/@altera/ingest": {
       "name": "@altera/ingest",
       "version": "0.1.0",
@@ -132,6 +158,10 @@
         "xlsx": "^0.18.5",
       },
     },
+    "packages/@altera/loom": {
+      "name": "@altera/loom",
+      "version": "0.1.0",
+    },
   },
   "packages": {
     "@altera/agent": ["@altera/agent@workspace:packages/@altera/agent"],
@@ -142,11 +172,17 @@
 
     "@altera/db": ["@altera/db@workspace:packages/@altera/db"],
 
+    "@altera/docs": ["@altera/docs@workspace:packages/@altera/docs"],
+
     "@altera/eav": ["@altera/eav@workspace:packages/@altera/eav"],
 
     "@altera/events": ["@altera/events@workspace:packages/@altera/events"],
 
+    "@altera/flows": ["@altera/flows@workspace:packages/@altera/flows"],
+
     "@altera/ingest": ["@altera/ingest@workspace:packages/@altera/ingest"],
+
+    "@altera/loom": ["@altera/loom@workspace:packages/@altera/loom"],
 
     "@babel/code-frame": ["@babel/code-frame@7.29.0", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.28.5", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw=="],
 

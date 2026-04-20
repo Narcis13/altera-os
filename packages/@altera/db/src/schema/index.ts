@@ -5,3 +5,5 @@ export * from './files.ts';
 export * from './events.ts';
 export * from './entities.ts';
 export * from './taxonomy.ts';
+export * from './docs.ts';
+export * from './flows.ts';
