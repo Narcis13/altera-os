@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { api } from '../api';
+import { AppShell } from '../components/AppShell';
 import { type RealtimeTransport, useRealtime } from '../realtime';
 
 const EVENT_TYPES = [
@@ -55,18 +55,8 @@ export function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
-        <div>
-          <h1 className="text-lg font-semibold">Events — Realtime Debug</h1>
-          <p className="text-xs text-slate-500">SSE / WS event stream</p>
-        </div>
-        <Link to="/" className="text-sm text-slate-600 hover:underline">
-          ← Dashboard
-        </Link>
-      </header>
-
-      <main className="p-6 grid gap-4 lg:grid-cols-[280px_1fr]">
+    <AppShell title="Events — Realtime Debug" subtitle="SSE / WS event stream">
+      <div className="p-6 grid gap-4 lg:grid-cols-[280px_1fr]">
         <aside className="space-y-4">
           <section className="rounded-xl bg-white border border-slate-200 p-4">
             <div className="text-xs uppercase tracking-wide text-slate-500 mb-2">Transport</div>
@@ -177,8 +167,8 @@ export function EventsPage() {
             </ul>
           )}
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
 

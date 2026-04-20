@@ -16,6 +16,8 @@ export interface DocsRender {
   status: 'success' | 'error';
   errors: RenderError[] | null;
   renderedAt: Date;
+  publishedAt: Date | null;
+  publishedBy: string | null;
 }
 
 function rowToRender(row: typeof docsRenders.$inferSelect): DocsRender {
@@ -28,6 +30,8 @@ function rowToRender(row: typeof docsRenders.$inferSelect): DocsRender {
     status: row.status,
     errors: row.errors ? (JSON.parse(row.errors) as RenderError[]) : null,
     renderedAt: row.renderedAt,
+    publishedAt: row.publishedAt ?? null,
+    publishedBy: row.publishedBy ?? null,
   };
 }
 
@@ -70,7 +74,20 @@ export function createRenderService(deps: RenderServiceDeps) {
         status,
         errors: errors ?? null,
         renderedAt: now,
+        publishedAt: null,
+        publishedBy: null,
       };
+    },
+
+    publish(tenantId: string, id: string, publishedBy: string | null): DocsRender | undefined {
+      const existing = this.getById(tenantId, id);
+      if (!existing) return undefined;
+      const now = new Date();
+      db.update(docsRenders)
+        .set({ publishedAt: now, publishedBy: publishedBy ?? null })
+        .where(and(eq(docsRenders.id, id), eq(docsRenders.tenantId, tenantId)))
+        .run();
+      return { ...existing, publishedAt: now, publishedBy: publishedBy ?? null };
     },
 
     renderFromTemplate(

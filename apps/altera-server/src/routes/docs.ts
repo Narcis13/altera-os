@@ -1,6 +1,7 @@
 import { type JwtConfig, requireAuth } from '@altera/auth';
 import { notFound, validationError } from '@altera/core';
 import type { AlteraDb } from '@altera/db';
+import type { EventBus } from '@altera/events';
 import {
   createRenderService,
   createSubmissionService,
@@ -29,6 +30,7 @@ function ensureComponentsRegistered() {
 export interface DocsRoutesDeps {
   db: AlteraDb;
   jwt: JwtConfig;
+  bus?: EventBus;
 }
 
 const createTemplateSchema = z.object({
@@ -238,6 +240,8 @@ export function docsRoutes(deps: DocsRoutesDeps): Hono {
         templateId: render.templateId,
         status: render.status,
         renderedAt: render.renderedAt.toISOString(),
+        publishedAt: render.publishedAt ? render.publishedAt.toISOString() : null,
+        publishedBy: render.publishedBy,
         html: render.html,
         errors: render.errors ?? [],
       },
@@ -256,11 +260,51 @@ export function docsRoutes(deps: DocsRoutesDeps): Hono {
         templateId: r.templateId,
         status: r.status,
         renderedAt: r.renderedAt.toISOString(),
+        publishedAt: r.publishedAt ? r.publishedAt.toISOString() : null,
+        publishedBy: r.publishedBy,
       })),
       total: result.total,
       limit: result.limit,
       offset: result.offset,
     });
+  });
+
+  app.post('/renders/:id/publish', async (c) => {
+    const principal = c.get('principal');
+    const render = renders.publish(
+      principal.tenantId,
+      c.req.param('id'),
+      principal.userId ?? null,
+    );
+    if (!render) throw notFound('Render not found');
+    if (render.status !== 'success') {
+      throw validationError('Cannot publish a render with status=error');
+    }
+    if (deps.bus) {
+      await deps.bus.emit({
+        tenantId: principal.tenantId,
+        userId: principal.userId ?? null,
+        type: 'report.published',
+        payload: { reportId: render.id, destination: 'inline' },
+      });
+    }
+    return c.json({
+      render: {
+        id: render.id,
+        templateId: render.templateId,
+        status: render.status,
+        renderedAt: render.renderedAt.toISOString(),
+        publishedAt: render.publishedAt ? render.publishedAt.toISOString() : null,
+        publishedBy: render.publishedBy,
+      },
+    });
+  });
+
+  app.delete('/templates/:id', (c) => {
+    const principal = c.get('principal');
+    const ok = templates.delete(principal.tenantId, c.req.param('id'));
+    if (!ok) throw notFound('Template not found');
+    return c.json({ ok: true });
   });
 
   app.post('/templates/:id/submissions', async (c) => {

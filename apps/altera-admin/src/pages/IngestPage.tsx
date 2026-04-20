@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { type FileDetail, type FileListItem, api } from '../api';
+import { AppShell } from '../components/AppShell';
 
 const PAGE_SIZE = 25;
 
@@ -117,18 +117,8 @@ export function IngestPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
-        <div>
-          <h1 className="text-lg font-semibold">Ingest</h1>
-          <p className="text-xs text-slate-500">Upload files → parse → pre-EAV</p>
-        </div>
-        <Link to="/" className="text-sm text-slate-600 hover:underline">
-          ← Dashboard
-        </Link>
-      </header>
-
-      <main className="p-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+    <AppShell title="Ingest" subtitle="Upload files → parse → pre-EAV">
+      <div className="p-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
         <section className="space-y-4 min-w-0">
           <div
             onDragOver={(e) => {
@@ -304,7 +294,7 @@ export function IngestPage() {
             </div>
           )}
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

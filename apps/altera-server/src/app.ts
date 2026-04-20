@@ -13,6 +13,8 @@ import type { ServerConfig } from './config.ts';
 import { errorHandler } from './middleware/error.ts';
 import { corsMiddleware, requestLogger } from './middleware/logging.ts';
 import { authRoutes } from './routes/auth.ts';
+import { chatRoutes } from './routes/chat.ts';
+import { dashboardRoutes } from './routes/dashboard.ts';
 import { docsRoutes } from './routes/docs.ts';
 import { entitiesRoutes } from './routes/entities.ts';
 import { taxonomyRoutes } from './routes/taxonomy.ts';
@@ -99,8 +101,10 @@ export function buildAppWithBus(deps: BuildAppDeps): BuiltApp {
   );
   app.route('/api/entities', entitiesRoutes({ db: deps.db, jwt }));
   app.route('/api/taxonomy', taxonomyRoutes({ db: deps.db, jwt }));
-  app.route('/api/docs', docsRoutes({ db: deps.db, jwt }));
+  app.route('/api/docs', docsRoutes({ db: deps.db, jwt, bus }));
   app.route('/api/flows', flowsRoutes({ db: deps.db, jwt, anthropic }));
+  app.route('/api/dashboard', dashboardRoutes({ db: deps.db, jwt }));
+  app.route('/api/chat', chatRoutes({ db: deps.db, jwt, bus, anthropic }));
 
   app.notFound((c) =>
     c.json(

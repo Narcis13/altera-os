@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   type EntityAttribute,
   type EntityDetailResponse,
@@ -10,6 +9,7 @@ import {
   type TaxonomyResponse,
   api,
 } from '../api';
+import { AppShell } from '../components/AppShell';
 
 const PAGE_SIZE = 25;
 const ALL_STATUSES: EntityStatus[] = ['raw', 'classified', 'structured', 'archived'];
@@ -169,20 +169,11 @@ export function EntitiesPage() {
   const typeOptions = Array.from(new Set([...activeEntityTypes, ...defaults])).sort();
 
   return (
-    <div className="min-h-screen">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white">
-        <div>
-          <h1 className="text-lg font-semibold">Entities — EAV browser</h1>
-          <p className="text-xs text-slate-500">
-            Classified entities + their attributes, with full-text search.
-          </p>
-        </div>
-        <Link to="/" className="text-sm text-slate-600 hover:underline">
-          ← Dashboard
-        </Link>
-      </header>
-
-      <main className="p-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+    <AppShell
+      title="Entities — EAV browser"
+      subtitle="Classified entities + their attributes, with full-text search."
+    >
+      <div className="p-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <section className="space-y-4 min-w-0">
           <div className="rounded-xl bg-white border border-slate-200 p-4 space-y-3">
             <div>
@@ -413,7 +404,7 @@ export function EntitiesPage() {
             </div>
           )}
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

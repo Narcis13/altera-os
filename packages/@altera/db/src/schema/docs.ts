@@ -74,6 +74,8 @@ export const docsRenders = sqliteTable(
     renderedAt: integer('rendered_at', { mode: 'timestamp_ms' })
       .notNull()
       .$defaultFn(() => new Date()),
+    publishedAt: integer('published_at', { mode: 'timestamp_ms' }),
+    publishedBy: text('published_by'),
   },
   (t) => ({
     tenantIdx: index('docs_renders_tenant_idx').on(t.tenantId),

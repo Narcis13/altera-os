@@ -157,6 +157,107 @@ export interface FileDetail {
   parseMetadata: unknown;
 }
 
+export interface DashboardStats {
+  tenant: {
+    id: string;
+    slug: string;
+    name: string;
+    createdAt: string;
+    userCount: number;
+  } | null;
+  counts: {
+    files: number;
+    entities: number;
+    templates: number;
+    renders: number;
+    workflows: number;
+  };
+  entitiesByType: Array<{ entityType: string; count: number }>;
+  activeWorkflows: Array<{
+    id: string;
+    workflowName: string;
+    status: string;
+    startedAt: string;
+  }>;
+  recentEvents: Array<{
+    id: string;
+    type: string;
+    createdAt: string;
+    payload: unknown;
+  }>;
+}
+
+export interface DocsTemplateListItem {
+  id: string;
+  slug: string;
+  kind: 'report' | 'form' | 'hybrid';
+  status: 'draft' | 'published' | 'archived';
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocsTemplateDetail {
+  id: string;
+  slug: string;
+  kind: 'report' | 'form' | 'hybrid';
+  status: 'draft' | 'published' | 'archived';
+  definition: unknown;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocsRenderListItem {
+  id: string;
+  templateId: string | null;
+  status: 'success' | 'error';
+  renderedAt: string;
+  publishedAt: string | null;
+  publishedBy: string | null;
+}
+
+export interface DocsRenderDetail extends DocsRenderListItem {
+  html: string;
+  errors: unknown[];
+}
+
+export interface AgentMessage {
+  role: 'user' | 'assistant' | 'tool' | 'system';
+  content: string | null;
+  toolUses?: Array<{ id: string; name: string; input: Record<string, unknown> }>;
+  toolResult?: { toolUseId: string; content: string; isError?: boolean };
+}
+
+export type AgentRuntimeEvent =
+  | { type: 'iteration.start'; iteration: number }
+  | { type: 'provider.response'; iteration: number; stopReason: string }
+  | { type: 'tool.call'; iteration: number; toolName: string; input: unknown }
+  | {
+      type: 'tool.result';
+      iteration: number;
+      toolName: string;
+      output: string;
+      isError: boolean;
+    }
+  | { type: 'run.finish'; iterations: number; stopReason: string };
+
+export interface ChatStatus {
+  enabled: boolean;
+  provider: 'anthropic' | 'mock';
+  model: string | null;
+}
+
+export interface ChatResponse {
+  provider: 'anthropic' | 'mock';
+  model: string;
+  finalContent: string | null;
+  messages: AgentMessage[];
+  toolsUsed: string[];
+  iterations: number;
+  stopReason: string;
+  events: AgentRuntimeEvent[];
+}
+
 export const api = {
   login(input: { tenantSlug: string; usernameOrEmail: string; password: string }) {
     return request<Session>('/api/auth/login', {
@@ -230,6 +331,91 @@ export const api = {
   putTaxonomy(input: { entries: TaxonomyEntryInput[]; replace?: boolean }) {
     return request<{ entries: TaxonomyEntry[] }>('/api/taxonomy', {
       method: 'PUT',
+      body: JSON.stringify(input),
+    });
+  },
+
+  getDashboardStats() {
+    return request<DashboardStats>('/api/dashboard/stats');
+  },
+
+  listTemplates(kind?: 'report' | 'form' | 'hybrid') {
+    const qs = kind ? `?kind=${encodeURIComponent(kind)}` : '';
+    return request<{ templates: DocsTemplateListItem[] }>(`/api/docs/templates${qs}`);
+  },
+
+  getTemplate(id: string) {
+    return request<{ template: DocsTemplateDetail }>(`/api/docs/templates/${id}`);
+  },
+
+  createTemplate(input: { slug: string; kind: 'report' | 'form' | 'hybrid'; definition: unknown }) {
+    return request<{ template: DocsTemplateDetail }>('/api/docs/templates', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  updateTemplate(
+    id: string,
+    input: {
+      slug?: string;
+      definition?: unknown;
+      status?: 'draft' | 'published' | 'archived';
+    },
+  ) {
+    return request<{ template: DocsTemplateDetail }>(`/api/docs/templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+  },
+
+  renderTemplate(input: {
+    templateId?: string;
+    definition?: unknown;
+    data: Record<string, unknown>;
+    persist?: boolean;
+  }) {
+    return request<{
+      render: DocsRenderListItem | null;
+      html: string;
+      errors: unknown[];
+    }>('/api/docs/render', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+
+  listRenders(input: { templateId?: string; limit?: number; offset?: number } = {}) {
+    const params = new URLSearchParams();
+    if (input.templateId) params.set('templateId', input.templateId);
+    if (input.limit !== undefined) params.set('limit', String(input.limit));
+    if (input.offset !== undefined) params.set('offset', String(input.offset));
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return request<{
+      items: DocsRenderListItem[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/api/docs/renders${qs}`);
+  },
+
+  getRender(id: string) {
+    return request<{ render: DocsRenderDetail }>(`/api/docs/renders/${id}`);
+  },
+
+  publishRender(id: string) {
+    return request<{ render: DocsRenderListItem }>(`/api/docs/renders/${id}/publish`, {
+      method: 'POST',
+    });
+  },
+
+  chatStatus() {
+    return request<ChatStatus>('/api/chat/status');
+  },
+
+  chat(input: { messages: AgentMessage[]; system?: string; maxIterations?: number }) {
+    return request<ChatResponse>('/api/chat/messages', {
+      method: 'POST',
       body: JSON.stringify(input),
     });
   },
